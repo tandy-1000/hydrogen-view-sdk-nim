@@ -9,10 +9,7 @@
 ### Write a series of macros / helpers to expand jsffi
 ### imports, wrapping es classes,
 
-import
-  std/[macros, genasts, jsffi],
-  nodejs/jsurl
-
+import std/[macros, genasts, jsffi]
 
 
 func addModuleDecl(n: NimNode, module: string): tuple[typ, inst: NimNode] =
@@ -173,9 +170,10 @@ template `~`*(s: string): cstring =
   ## Convienient operator to convert `string` -> `cstring`
   s.cstring
 
-macro importUrlFrom*(varname: untyped, path, library: static[string]) =
+macro importUrlFrom*(varName: untyped, path, library: static[string]) =
+  ## Generate a JS import for a URL, and store it in the varName passed.
   # Generate a new url symbol
-  expectKind varname, nnkIdent
+  expectKind varName, nnkIdent
   let url = genSym(nskLet, repr varname)
   # Get its unique name
   let rawUrlName = repr(url)
@@ -187,5 +185,12 @@ macro importUrlFrom*(varname: untyped, path, library: static[string]) =
 
   result.add:
     # Generate the declaration for the symbol, importing the unique name
-    genAst(varname, rawUrlName, JsObject = bindSym"JsObject"):
-      let varname {.importc: rawUrlName, nodecl.}: JsObject
+    genAst(varName, rawUrlName, JsObject = bindSym"JsObject"):
+      let varName {.importc: rawUrlName, nodecl.}: JsObject
+
+func importModule*(module: cstring) {.importjs: "import #".}
+
+template importFromModule*(module, library: static[cstring]) =
+  assert(cond = (module.len > 0 and library.len > 0), msg = "Argument must not be empty string")
+  {.emit: ["import ", module, " from '", library, "';"].}
+
