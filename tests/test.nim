@@ -12,13 +12,15 @@ importUrlFrom(olmWasmPath, "olmWasmPath", "@matrix-org/olm/olm.wasm?url")
 importUrlFrom(olmJsPath, "olmJsPath", "@matrix-org/olm/olm.js?url")
 importUrlFrom(olmLegacyJsPath, "olmLegacyJsPath", "@matrix-org/olm/olm_legacy.js?url")
 
-var assetPaths = newJsObject()
-assetPaths.downloadSandbox = downloadSandboxPath
-assetPaths.worker = workerPath
-assetPaths.olm = newJsObject()
-assetPaths.olm.wasm = olmWasmPath
-assetPaths.olm.legacyBundle = olmLegacyJsPath
-assetPaths.olm.wasmBundle = olmJsPath
+var assetPaths = js{
+  downloadSandbox: downloadSandboxPath,
+  worker: workerPath,
+  olm: js{
+    wasm: olmWasmPath
+    legacyBundle: olmLegacyJsPath
+    wasmBundle: olmJsPath
+  }
+}
 
 importModule("hydrogen-view-sdk/style.css")
 
